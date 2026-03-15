@@ -23,6 +23,7 @@
 //! ```
 
 mod arbitrary;
+mod arbitrary_std;
 mod error;
 mod gen;
 mod shrink;
