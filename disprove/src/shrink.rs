@@ -5,3 +5,11 @@
 pub fn empty_shrinker<T: 'static>() -> Box<dyn Iterator<Item = T>> {
     Box::new(std::iter::empty())
 }
+
+/// Chain two shrink iterators together.
+pub fn chain<T: 'static>(
+    a: Box<dyn Iterator<Item = T>>,
+    b: Box<dyn Iterator<Item = T>>,
+) -> Box<dyn Iterator<Item = T>> {
+    Box::new(a.chain(b))
+}
