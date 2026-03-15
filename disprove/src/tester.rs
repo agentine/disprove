@@ -151,8 +151,7 @@ impl QuickCheck {
                     let detail = if msg.is_empty() {
                         format!(
                             "[disprove] FAILED after {} passed tests (test #{})",
-                            passed,
-                            total
+                            passed, total
                         )
                     } else {
                         format!(
@@ -349,17 +348,13 @@ mod tests {
     #[test]
     fn test_quickcheck_passing() {
         // A property that always passes
-        QuickCheck::new()
-            .tests(50)
-            .quickcheck(|| -> bool { true });
+        QuickCheck::new().tests(50).quickcheck(|| -> bool { true });
     }
 
     #[test]
     #[should_panic(expected = "[disprove] FAILED")]
     fn test_quickcheck_failing() {
-        QuickCheck::new()
-            .tests(50)
-            .quickcheck(|| -> bool { false });
+        QuickCheck::new().tests(50).quickcheck(|| -> bool { false });
     }
 
     #[test]
@@ -367,21 +362,23 @@ mod tests {
         use std::sync::atomic::{AtomicU64, Ordering};
         let count = std::sync::Arc::new(AtomicU64::new(0));
         let count2 = count.clone();
-        QuickCheck::new().tests(10).quickcheck(move || -> TestResult {
-            let c = count2.fetch_add(1, Ordering::Relaxed);
-            if c % 2 == 0 {
-                TestResult::Discard
-            } else {
-                TestResult::Pass
-            }
-        });
+        QuickCheck::new()
+            .tests(10)
+            .quickcheck(move || -> TestResult {
+                let c = count2.fetch_add(1, Ordering::Relaxed);
+                if c % 2 == 0 {
+                    TestResult::Discard
+                } else {
+                    TestResult::Pass
+                }
+            });
     }
 
     #[test]
     fn test_testable_args1_passing() {
         QuickCheck::new()
             .tests(50)
-            .quickcheck(testable_args1(|x: u8| -> bool { x < 200 || x >= 200 }));
+            .quickcheck(testable_args1(|_x: u8| -> bool { true }));
     }
 
     #[test]

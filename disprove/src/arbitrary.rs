@@ -320,7 +320,11 @@ mod tests {
         let mut g = Gen::from_seed(50, 42);
         for _ in 0..200 {
             let v = i32::arbitrary(&mut g);
-            assert!((-50..=50).contains(&v), "i32 should be in [-50, 50], got {}", v);
+            assert!(
+                (-50..=50).contains(&v),
+                "i32 should be in [-50, 50], got {}",
+                v
+            );
         }
     }
 
@@ -370,7 +374,11 @@ mod tests {
         let mut g = Gen::from_seed(100, 42);
         for _ in 0..200 {
             let v = f64::arbitrary(&mut g);
-            assert!(v >= -100.0 && v <= 100.0, "f64 should be in [-100, 100], got {}", v);
+            assert!(
+                (-100.0..=100.0).contains(&v),
+                "f64 should be in [-100, 100], got {}",
+                v
+            );
         }
     }
 

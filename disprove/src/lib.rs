@@ -9,21 +9,19 @@
 //! ## Quick Start
 //!
 //! ```rust
-//! use disprove::{quickcheck, Arbitrary, Gen};
+//! use disprove::{testable_args1, QuickCheck};
 //!
 //! fn prop_reverse_reverse(xs: Vec<i32>) -> bool {
 //!     let rev: Vec<_> = xs.iter().rev().rev().cloned().collect();
 //!     rev == xs
 //! }
 //!
-//! #[test]
-//! fn test_reverse() {
-//!     quickcheck(prop_reverse_reverse as fn(Vec<i32>) -> bool);
-//! }
+//! QuickCheck::new().quickcheck(testable_args1(prop_reverse_reverse));
 //! ```
 
 mod arbitrary;
 mod arbitrary_std;
+pub mod compat;
 mod error;
 mod gen;
 mod shrink;

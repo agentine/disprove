@@ -55,7 +55,9 @@ impl<T: Arbitrary> Arbitrary for Vec<T> {
 impl<K: Arbitrary + Eq + Hash, V: Arbitrary> Arbitrary for HashMap<K, V> {
     fn arbitrary(g: &mut Gen) -> Self {
         let len = g.gen_range(0..=g.size());
-        (0..len).map(|_| (K::arbitrary(g), V::arbitrary(g))).collect()
+        (0..len)
+            .map(|_| (K::arbitrary(g), V::arbitrary(g)))
+            .collect()
     }
 
     fn shrink(&self) -> Box<dyn Iterator<Item = Self>> {
@@ -111,7 +113,9 @@ impl<T: Arbitrary + Eq + Hash> Arbitrary for HashSet<T> {
 impl<K: Arbitrary + Ord, V: Arbitrary> Arbitrary for BTreeMap<K, V> {
     fn arbitrary(g: &mut Gen) -> Self {
         let len = g.gen_range(0..=g.size());
-        (0..len).map(|_| (K::arbitrary(g), V::arbitrary(g))).collect()
+        (0..len)
+            .map(|_| (K::arbitrary(g), V::arbitrary(g)))
+            .collect()
     }
 
     fn shrink(&self) -> Box<dyn Iterator<Item = Self>> {
@@ -541,7 +545,11 @@ impl<T: Arbitrary + PartialOrd> Arbitrary for Range<T> {
     fn arbitrary(g: &mut Gen) -> Self {
         let a = T::arbitrary(g);
         let b = T::arbitrary(g);
-        if a < b { a..b } else { b..a }
+        if a < b {
+            a..b
+        } else {
+            b..a
+        }
     }
 }
 
@@ -551,7 +559,11 @@ impl<T: Arbitrary + PartialOrd> Arbitrary for RangeInclusive<T> {
     fn arbitrary(g: &mut Gen) -> Self {
         let a = T::arbitrary(g);
         let b = T::arbitrary(g);
-        if a < b { a..=b } else { b..=a }
+        if a < b {
+            a..=b
+        } else {
+            b..=a
+        }
     }
 }
 
@@ -606,15 +618,26 @@ impl Arbitrary for Duration {
 
 impl Arbitrary for Ipv4Addr {
     fn arbitrary(g: &mut Gen) -> Self {
-        Ipv4Addr::new(u8::arbitrary(g), u8::arbitrary(g), u8::arbitrary(g), u8::arbitrary(g))
+        Ipv4Addr::new(
+            u8::arbitrary(g),
+            u8::arbitrary(g),
+            u8::arbitrary(g),
+            u8::arbitrary(g),
+        )
     }
 }
 
 impl Arbitrary for Ipv6Addr {
     fn arbitrary(g: &mut Gen) -> Self {
         Ipv6Addr::new(
-            u16::arbitrary(g), u16::arbitrary(g), u16::arbitrary(g), u16::arbitrary(g),
-            u16::arbitrary(g), u16::arbitrary(g), u16::arbitrary(g), u16::arbitrary(g),
+            u16::arbitrary(g),
+            u16::arbitrary(g),
+            u16::arbitrary(g),
+            u16::arbitrary(g),
+            u16::arbitrary(g),
+            u16::arbitrary(g),
+            u16::arbitrary(g),
+            u16::arbitrary(g),
         )
     }
 }
