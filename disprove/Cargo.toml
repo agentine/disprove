@@ -1,0 +1,22 @@
+[package]
+name = "disprove"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+license = "MIT OR Apache-2.0"
+description = "Property-based testing for Rust — a modern replacement for quickcheck"
+repository = "https://github.com/agentine/disprove"
+keywords = ["testing", "quickcheck", "property-based", "fuzzing"]
+categories = ["development-tools::testing"]
+
+[features]
+default = ["std", "macros"]
+std = []
+macros = ["dep:disprove_macros"]
+
+[dependencies]
+rand = { version = "0.8", features = ["small_rng"] }
+disprove_macros = { path = "../disprove_macros", optional = true }
+
+[dev-dependencies]
+rand = "0.8"

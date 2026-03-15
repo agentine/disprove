@@ -1,0 +1,16 @@
+[package]
+name = "disprove_macros"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+license = "MIT OR Apache-2.0"
+description = "Proc macros for the disprove property-based testing library"
+repository = "https://github.com/agentine/disprove"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+syn = { version = "2", features = ["full"] }
+quote = "1"
+proc-macro2 = "1"
