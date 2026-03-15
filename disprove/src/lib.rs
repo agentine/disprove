@@ -32,7 +32,10 @@ mod tester;
 pub use arbitrary::Arbitrary;
 pub use gen::Gen;
 pub use shrink::empty_shrinker;
-pub use tester::{quickcheck, QuickCheck, TestResult, Testable};
+pub use tester::{
+    quickcheck, testable_args1, testable_args2, testable_args3, testable_args4, testable_args5,
+    testable_args6, testable_args7, testable_args8, QuickCheck, TestResult, Testable,
+};
 
 #[cfg(feature = "macros")]
 pub use disprove_macros::quickcheck as quickcheck_macro;

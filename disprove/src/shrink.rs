@@ -7,6 +7,7 @@ pub fn empty_shrinker<T: 'static>() -> Box<dyn Iterator<Item = T>> {
 }
 
 /// Chain two shrink iterators together.
+#[allow(dead_code)]
 pub fn chain<T: 'static>(
     a: Box<dyn Iterator<Item = T>>,
     b: Box<dyn Iterator<Item = T>>,
