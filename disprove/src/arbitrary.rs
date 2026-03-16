@@ -27,7 +27,7 @@ pub trait Arbitrary: Clone + Debug + 'static {
 
 impl Arbitrary for bool {
     fn arbitrary(g: &mut Gen) -> Self {
-        g.rng().gen()
+        g.rng().random()
     }
 
     fn shrink(&self) -> Box<dyn Iterator<Item = Self>> {
@@ -83,7 +83,40 @@ arbitrary_unsigned!(u16);
 arbitrary_unsigned!(u32);
 arbitrary_unsigned!(u64);
 arbitrary_unsigned!(u128);
-arbitrary_unsigned!(usize);
+
+// usize: rand 0.9 removed SampleUniform for usize, so generate via u64.
+impl Arbitrary for usize {
+    fn arbitrary(g: &mut Gen) -> Self {
+        let s = g.size();
+        if s == 0 {
+            return 0;
+        }
+        let upper = if s as u128 >= usize::MAX as u128 {
+            usize::MAX as u64
+        } else {
+            s as u64
+        };
+        g.gen_range(0u64..=upper) as usize
+    }
+
+    fn shrink(&self) -> Box<dyn Iterator<Item = Self>> {
+        let val = *self;
+        if val == 0 {
+            return empty_shrinker();
+        }
+        let mut candidates = Vec::new();
+        candidates.push(0);
+        let mut diff = val;
+        loop {
+            diff /= 2;
+            if diff == 0 {
+                break;
+            }
+            candidates.push(val - diff);
+        }
+        Box::new(candidates.into_iter())
+    }
+}
 
 // -- signed integers --
 // Uses checked_neg to fix quickcheck's integer negation overflow bug on MIN values.
@@ -149,14 +182,60 @@ arbitrary_signed!(i16);
 arbitrary_signed!(i32);
 arbitrary_signed!(i64);
 arbitrary_signed!(i128);
-arbitrary_signed!(isize);
+
+// isize: rand 0.9 removed SampleUniform for isize, so generate via i64.
+impl Arbitrary for isize {
+    fn arbitrary(g: &mut Gen) -> Self {
+        let s = g.size();
+        if s == 0 {
+            return 0;
+        }
+        let upper = if s as u128 >= isize::MAX as u128 {
+            isize::MAX as i64
+        } else {
+            s as i64
+        };
+        let lower = if upper == isize::MAX as i64 {
+            isize::MIN as i64
+        } else {
+            -upper
+        };
+        g.gen_range(lower..=upper) as isize
+    }
+
+    fn shrink(&self) -> Box<dyn Iterator<Item = Self>> {
+        let val = *self;
+        if val == 0 {
+            return empty_shrinker();
+        }
+        let mut candidates = Vec::new();
+        candidates.push(0);
+        if val < 0 {
+            if let Some(pos) = val.checked_neg() {
+                candidates.push(pos);
+            }
+        }
+        let mut diff = val;
+        loop {
+            diff /= 2;
+            if diff == 0 {
+                break;
+            }
+            let candidate = val - diff;
+            if candidate != 0 {
+                candidates.push(candidate);
+            }
+        }
+        Box::new(candidates.into_iter())
+    }
+}
 
 // -- floating point --
 
 impl Arbitrary for f32 {
     fn arbitrary(g: &mut Gen) -> Self {
         let s = g.size() as f32;
-        g.rng().gen::<f32>() * s * 2.0 - s
+        g.rng().random::<f32>() * s * 2.0 - s
     }
 
     fn shrink(&self) -> Box<dyn Iterator<Item = Self>> {
@@ -183,7 +262,7 @@ impl Arbitrary for f32 {
 impl Arbitrary for f64 {
     fn arbitrary(g: &mut Gen) -> Self {
         let s = g.size() as f64;
-        g.rng().gen::<f64>() * s * 2.0 - s
+        g.rng().random::<f64>() * s * 2.0 - s
     }
 
     fn shrink(&self) -> Box<dyn Iterator<Item = Self>> {

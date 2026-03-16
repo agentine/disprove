@@ -530,14 +530,102 @@ arbitrary_nonzero_unsigned!(NonZeroU16, u16);
 arbitrary_nonzero_unsigned!(NonZeroU32, u32);
 arbitrary_nonzero_unsigned!(NonZeroU64, u64);
 arbitrary_nonzero_unsigned!(NonZeroU128, u128);
-arbitrary_nonzero_unsigned!(NonZeroUsize, usize);
+// NonZeroUsize: rand 0.9 removed SampleUniform for usize, so generate via u64.
+impl Arbitrary for NonZeroUsize {
+    fn arbitrary(g: &mut Gen) -> Self {
+        let s = g.size();
+        let upper = if s as u128 >= usize::MAX as u128 {
+            usize::MAX as u64
+        } else if s == 0 {
+            1
+        } else {
+            s as u64
+        };
+        let val = g.gen_range(1u64..=upper) as usize;
+        NonZeroUsize::new(val).unwrap()
+    }
+
+    fn shrink(&self) -> Box<dyn Iterator<Item = Self>> {
+        let val = self.get();
+        if val == 1 {
+            return empty_shrinker();
+        }
+        let mut candidates = Vec::new();
+        candidates.push(NonZeroUsize::new(1).unwrap());
+        let mut diff = val;
+        loop {
+            diff /= 2;
+            if diff == 0 {
+                break;
+            }
+            let candidate = val - diff;
+            if candidate > 1 {
+                candidates.push(NonZeroUsize::new(candidate).unwrap());
+            }
+        }
+        Box::new(candidates.into_iter())
+    }
+}
 
 arbitrary_nonzero_signed!(NonZeroI8, i8);
 arbitrary_nonzero_signed!(NonZeroI16, i16);
 arbitrary_nonzero_signed!(NonZeroI32, i32);
 arbitrary_nonzero_signed!(NonZeroI64, i64);
 arbitrary_nonzero_signed!(NonZeroI128, i128);
-arbitrary_nonzero_signed!(NonZeroIsize, isize);
+// NonZeroIsize: rand 0.9 removed SampleUniform for isize, so generate via i64.
+impl Arbitrary for NonZeroIsize {
+    fn arbitrary(g: &mut Gen) -> Self {
+        let s = g.size();
+        let upper = if s as u128 >= isize::MAX as u128 {
+            isize::MAX as i64
+        } else if s == 0 {
+            1
+        } else {
+            s as i64
+        };
+        let lower = if upper == isize::MAX as i64 {
+            isize::MIN as i64
+        } else {
+            -upper
+        };
+        loop {
+            let val = g.gen_range(lower..=upper) as isize;
+            if val != 0 {
+                return NonZeroIsize::new(val).unwrap();
+            }
+        }
+    }
+
+    fn shrink(&self) -> Box<dyn Iterator<Item = Self>> {
+        let val = self.get();
+        if val == 1 || val == -1 {
+            return empty_shrinker();
+        }
+        let mut candidates = Vec::new();
+        candidates.push(NonZeroIsize::new(1).unwrap());
+        if val < 0 {
+            if let Some(pos) = val.checked_neg() {
+                if let Some(nz) = NonZeroIsize::new(pos) {
+                    candidates.push(nz);
+                }
+            }
+        }
+        let mut diff = val;
+        loop {
+            diff /= 2;
+            if diff == 0 {
+                break;
+            }
+            let candidate = val - diff;
+            if candidate != 0 {
+                if let Some(nz) = NonZeroIsize::new(candidate) {
+                    candidates.push(nz);
+                }
+            }
+        }
+        Box::new(candidates.into_iter())
+    }
+}
 
 // -- Range<T> --
 

@@ -14,7 +14,7 @@ impl Gen {
     /// Create a new generator with the given size parameter.
     pub fn new(size: usize) -> Self {
         Gen {
-            rng: SmallRng::from_rng(rand::thread_rng()).unwrap(),
+            rng: SmallRng::from_rng(&mut rand::rng()),
             size,
         }
     }
@@ -44,21 +44,21 @@ impl Gen {
     /// Panics if the slice is empty.
     pub fn choose<'a, T>(&mut self, slice: &'a [T]) -> &'a T {
         assert!(!slice.is_empty(), "Gen::choose called on empty slice");
-        let idx = self.rng.gen_range(0..slice.len());
+        let idx = self.rng.random_range(0..slice.len());
         &slice[idx]
     }
 
     /// Generate a random value in the given range.
     pub fn gen_range<T, R>(&mut self, range: R) -> T
     where
-        T: rand::distributions::uniform::SampleUniform,
-        R: rand::distributions::uniform::SampleRange<T>,
+        T: rand::distr::uniform::SampleUniform,
+        R: rand::distr::uniform::SampleRange<T>,
     {
-        self.rng.gen_range(range)
+        self.rng.random_range(range)
     }
 
     /// Generate a random boolean.
     pub fn gen_bool(&mut self, probability: f64) -> bool {
-        self.rng.gen_bool(probability)
+        self.rng.random_bool(probability)
     }
 }
